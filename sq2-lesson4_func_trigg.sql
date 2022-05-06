@@ -1,14 +1,14 @@
 -- simple procedure
 drop procedure if exists sim_test;
-delimiter //
+delimiter // ;
 CREATE  PROCEDURE `sim_test` (OUT param1 int)
 BEGIN
 select count(*) into param1 from departments;
 END
 //
 -- end simple procedure
+delimiter ; //
 
-delimiter ;
 -- test
 set @param1 =0;
 call employees.sim_test(@param1);
@@ -35,7 +35,7 @@ order by dept.dept_name
 
 -- find_fin procedure
 drop procedure if exists budget_dept;
-delimiter //
+delimiter // ;
 CREATE  PROCEDURE `budget_dept` (OUT param1 int, dept varchar(100))
 BEGIN
 select
@@ -50,11 +50,12 @@ from departments dept
 where dept.dept_name = dept
 group by dept.dept_no
 -- order by dept.dept_name
+-- limit 1
 ;
 END
 //
+delimiter ; //
 
-delimiter ;
 -- test
 select * from departments;
 
