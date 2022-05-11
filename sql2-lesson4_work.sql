@@ -110,4 +110,70 @@ VIEW `geodata`.`find_city_in_moskou_region` AS
 
 -- 2. Создать функцию, которая найдет менеджера по имени и фамилии.
 --
+-- test
+select
+e.*,
+de.emp_no as 'depart_number'
+from employees e
+left join dept_manager de on de.emp_no = e.emp_no
+where de.emp_no = get_mngr_name('Arie', 'Staelin')
+;
 
+--
+DROP function IF EXISTS `employees`.`get_mngr_name`;
+--
+CREATE FUNCTION `get_mngr_name`(f_name varchar(20), l_name varchar(20)) RETURNS varchar(100) CHARSET utf8mb4
+    READS SQL DATA
+    DETERMINISTIC
+    COMMENT '-- Создать функцию, которая найдет менеджера по имени и фамилии '
+begin
+declare result varchar(100);
+select
+	 de.emp_no into result
+from
+     employees e
+     left join dept_manager de on de.emp_no = e.emp_no
+where
+     e.first_name = f_name
+     and
+     e.last_name = l_name
+     ;
+RETURN (result);
+end
+
+
+-- 3. Создать триггер, который при добавлении нового сотрудника будет выплачивать ему вступительный бонус, занося запись об этом в таблицу salary.
+--
+INSERT INTO employees
+(emp_no, birth_date, first_name, last_name, gender, hire_date)
+SELECT @id:=(max(emp_no)+1), '1990-01-01', 'Ivan', 'Ivanov', 'M', current_date() FROM employees
+-- SELECT max(emp_no)+1, '1990-01-01', 'Ivan', 'Ivanov', 'M', current_date() FROM employees
+;
+
+-- DELETE !
+delete from employees
+where
+emp_no = 500000
+and first_name = 'Ivan'
+;
+
+-- after
+-- триггер на поступление/insert в employees/
+-- авто pay in salaries/ bonus=1345
+drop trigger if exists pay_bonus_employees;
+-- simple log trigger
+delimiter $$
+create trigger pay_bonus_employees
+ after insert on employees
+ for each row
+ BEGIN
+ declare bonus int default 1345;
+ -- set emp_id = @id;
+ insert into salaries SET
+ emp_no = @id,
+ salary = bonus,
+ from_date = CURRENT_DATE(),
+ to_date = '9999-01-01';
+ end;
+$$
+delimiter ;

@@ -73,7 +73,7 @@ select dept_name, to_upper(dept_name) from departments;
 
 select 
 e.*,
-de.emp_no as a2
+de.emp_no as 'depart_number'
 from employees e
 left join dept_manager de on de.emp_no = e.emp_no
 where de.emp_no = get_mngr_name('Arie', 'Staelin')
