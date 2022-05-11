@@ -63,3 +63,4 @@ select * from departments;
 call employees.budget_dept(@param1, 'Customer Service');
 select @param1;
 -- test budget dept procedure
+
